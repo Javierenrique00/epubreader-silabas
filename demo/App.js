@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { ReactReader } from '../src'
+import SilabasReader from './silabasReader'
 import {
   Container,
   ReaderContainer,
@@ -7,7 +8,7 @@ import {
   Logo,
   CloseButton,
   CloseIcon,
-  FontSizeButton
+  FontSizeButton,
 } from './Components'
 
 const storage = global.localStorage || null
@@ -21,9 +22,11 @@ class App extends Component {
         storage && storage.getItem('epub-location')
           ? storage.getItem('epub-location')
           : 2,
-      largeText: false
+      largeText: false,
+      sendText: "", // --Para enviar al control el texto que debe mostrar
     }
     this.rendition = null
+    this.getSectionText = this.getSectionText.bind(this);
   }
 
   toggleFullscreen = () => {
@@ -70,28 +73,20 @@ class App extends Component {
     rendition.themes.fontSize(largeText ? '140%' : '100%')
   }
 
+  //--- Trae el texto de toda una sección en formato HTML
   getSectionText(contents,view){
-    var stripedHtml = contents.replace(/<[^>]+>/g, ''); //--quita todo el HTML https://ourcodeworld.com/articles/read/376/how-to-strip-html-from-a-string-extract-only-text-content-in-javascript
-    console.log("Hook Funcionando OJOJOJOJO!!!",stripedHtml);
+    let stripedHtml = contents.replace(/<[^>]+>/g, ''); //--quita todo el HTML https://ourcodeworld.com/articles/read/376/how-to-strip-html-from-a-string-extract-only-text-content-in-javascript
+    //console.log("Hook Funcionando OJOJOJOJO!!!",stripedHtml);
+    this.setState({sendText:stripedHtml})
   }
 
   render() {
     const { fullscreen, location } = this.state
     return (
+      <div>
       <Container>
-        <Bar>
-          <a href="https://github.com/gerhardsletten/react-reader">
-            <Logo
-              src="https://s3-eu-west-1.amazonaws.com/react-reader/react-reader.svg"
-              alt="React-reader - powered by epubjs"
-            />
-          </a>
-          <CloseButton onClick={this.toggleFullscreen}>
-            Use full browser window
-            <CloseIcon />
-          </CloseButton>
-        </Bar>
-        <ReaderContainer fullscreen={fullscreen}>
+        <SilabasReader sendText={this.state.sendText}/>
+        <ReaderContainer>
           <ReactReader
             url={'https://s3-eu-west-1.amazonaws.com/react-reader/alice.epub'}
             locationChanged={this.onLocationChanged}
@@ -105,6 +100,8 @@ class App extends Component {
           </FontSizeButton>
         </ReaderContainer>
       </Container>
+      </div>
+
     )
   }
 }

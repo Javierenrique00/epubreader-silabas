@@ -91,3 +91,4 @@ export const FontSizeButton = Button.extend`
   border-radius: 2px;
   padding: 0.5rem;
 `
+
