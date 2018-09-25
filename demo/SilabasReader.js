@@ -13,6 +13,20 @@ function Linea(props){
     return (<p>{props.linea}</p>)
 }
 
+function WordArray(props){
+    let salida = []
+    let tam=props.param.length
+    for(let x=0;x<tam;x++){
+        if(props.index==x){
+            salida.push(<b>{props.param[x]}&nbsp;</b>)
+        }
+        else{
+            salida.push(<span>{props.param[x]}&nbsp;</span>)
+        }
+    }
+    return salida
+}
+
 
 class SilabasReader extends Component{
     constructor(props){
@@ -24,6 +38,8 @@ class SilabasReader extends Component{
         this.state = {
             linea: "",
             palabra: "",
+            wordArray: [],
+            wordCursor: 0,
         }   
     }
 
@@ -37,24 +53,29 @@ class SilabasReader extends Component{
             let salida=elemento.replace(re2, '')
             if(salida!="") this.lineArray.push(salida)
         })
-        let re3 = /\s/
-        this.wordArray = this.lineArray[this.lineCursor].split(re3)
+        this.lineCursor = 0;
+        this.wordCursor = 0;
+        this.showLine()
+
     }
     
-    showLine(){
-        //-- hace la conversión a vector de palabras
+    divideLineArray(){
         let re = /\s/
         this.wordArray = this.lineArray[this.lineCursor].split(re)
-        this.setState({linea:this.lineArray[this.lineCursor]})
-        this.setState({palabra:this.wordArray[this.wordCursor]})
     }
 
+    showLine(){
+        //-- hace la conversión a vector de palabras
+        this.divideLineArray();
+        // this.setState({linea:this.lineArray[this.lineCursor]})
+        // this.setState({palabra:this.wordArray[this.wordCursor]})
+        this.setState({wordArray:this.wordArray, wordCursor:this.wordCursor})
+
+    }
 
 
     //------ Tecla de avanzar
     nextKey(){
-        //--mira si puede avanzar
-        console.log("NEXT wcursor=",this.wordCursor)
         //--- avanza la palabra
         let wtam = this.wordArray.length
         if(this.wordCursor+1<wtam) {
@@ -63,7 +84,7 @@ class SilabasReader extends Component{
             //--- avanza la linea
             let tama = this.lineArray.length
             if(this.lineCursor+1<tama) this.lineCursor++
-            this.wordCursor = 0;
+            this.wordCursor = 0
         }
         //--muestra la linea
         this.showLine();
@@ -72,7 +93,20 @@ class SilabasReader extends Component{
 
     //------ Tecla de retroceder
     prevKey(){
-        
+        if(this.wordCursor!=0){
+            this.wordCursor--
+        }
+        else{
+            //--- retrocede la linea
+            if(this.lineCursor!=0){
+                this.lineCursor--
+                this.divideLineArray()
+                this.wordCursor = this.wordArray.length - 1
+            }
+
+        }
+        //--muestra la linea
+        this.showLine();
     }
 
 
@@ -94,20 +128,17 @@ class SilabasReader extends Component{
 
 
     componentWillMount() {
-        document.addEventListener("keydown", this._handleKeyDown.bind(this));
-        //this.showLine();
+        document.addEventListener("keydown", this._handleKeyDown.bind(this))
     }
 
     componentWillUnmount() {
-        document.removeEventListener("keydown", this._handleKeyDown.bind(this));
+        document.removeEventListener("keydown", this._handleKeyDown.bind(this))
     }
 
     render(){
         return (
         <Div>
-            <Linea linea={this.state.linea}/>
-            <br/>
-            <Linea linea={this.state.palabra}/>
+            <WordArray param={this.state.wordArray} index={this.state.wordCursor}/>
         </Div>
         )}
 }
