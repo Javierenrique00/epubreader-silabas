@@ -88,7 +88,7 @@ class App extends Component {
         <SilabasReader sendText={this.state.sendText}/>
         <ReaderContainer>
           <ReactReader
-            url={'https://s3-eu-west-1.amazonaws.com/react-reader/alice.epub'}
+            url={'https://f001.backblazeb2.com/file/orgpublicinfo99/general/alanpoe.epub'}
             locationChanged={this.onLocationChanged}
             title={'Alice in wonderland'}
             location={location}
